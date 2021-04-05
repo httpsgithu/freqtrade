@@ -1,4 +1,4 @@
-FROM python:3.9.3-slim-buster as base
+FROM python:3.10.0a6-slim-buster as base
 
 # Setup env
 ENV LANG C.UTF-8
