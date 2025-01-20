@@ -114,7 +114,45 @@ services:
       --strategy SampleStrategy
 
 ```
+
 You can use whatever naming convention you want, freqtrade1 and 2 are arbitrary. Note, that you will need to use different database files, port mappings and telegram configurations for each instance, as mentioned above. 
+
+## Use a different database system
+
+Freqtrade is using SQLAlchemy, which supports multiple different database systems. As such, a multitude of database systems should be supported.
+Freqtrade does not depend or install any additional database driver. Please refer to the [SQLAlchemy docs](https://docs.sqlalchemy.org/en/14/core/engines.html#database-urls) on installation instructions for the respective database systems.
+
+The following systems have been tested and are known to work with freqtrade:
+
+* sqlite (default)
+* PostgreSQL
+* MariaDB
+
+!!! Warning
+    By using one of the below database systems, you acknowledge that you know how to manage such a system. The freqtrade team will not provide any support with setup or maintenance (or backups) of the below database systems.
+
+### PostgreSQL
+
+Installation:
+`pip install psycopg2-binary`
+
+Usage:
+`... --db-url postgresql+psycopg2://<username>:<password>@localhost:5432/<database>`
+
+Freqtrade will automatically create the tables necessary upon startup.
+
+If you're running different instances of Freqtrade, you must either setup one database per Instance or use different users / schemas for your connections.
+
+### MariaDB / MySQL
+
+Freqtrade supports MariaDB by using SQLAlchemy, which supports multiple different database systems.
+
+Installation:
+`pip install pymysql`
+
+Usage:
+`... --db-url mysql+pymysql://<username>:<password>@localhost:3306/<database>`
+
 
 
 ## Configure the bot running as a systemd service
@@ -176,12 +214,15 @@ Log messages are send to `syslog` with the `user` facility. So you can see them 
 On many systems `syslog` (`rsyslog`) fetches data from `journald` (and vice versa), so both `--logfile syslog` or `--logfile journald` can be used and the messages be viewed with both `journalctl` and a syslog viewer utility. You can combine this in any way which suites you better.
 
 For `rsyslog` the messages from the bot can be redirected into a separate dedicated log file. To achieve this, add
+
 ```
 if $programname startswith "freqtrade" then -/var/log/freqtrade.log
 ```
+
 to one of the rsyslog configuration files, for example at the end of the `/etc/rsyslog.d/50-default.conf`.
 
 For `syslog` (`rsyslog`), the reduction mode can be switched on. This will reduce the number of repeating messages. For instance, multiple bot Heartbeat messages will be reduced to a single message when nothing else happens with the bot. To achieve this, set in `/etc/rsyslog.conf`:
+
 ```
 # Filter duplicated messages
 $RepeatedMsgReduction on
@@ -189,7 +230,7 @@ $RepeatedMsgReduction on
 
 ### Logging to journald
 
-This needs the `systemd` python package installed as the dependency, which is not available on Windows. Hence, the whole journald logging functionality is not available for a bot running on Windows.
+This needs the `cysystemd` python package installed as dependency (`pip install cysystemd`), which is not available on Windows. Hence, the whole journald logging functionality is not available for a bot running on Windows.
 
 To send Freqtrade log messages to `journald` system service use the `--logfile` command line option with the value in the following format:
 
